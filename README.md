@@ -145,6 +145,37 @@ Then you just provide this function to the `lerp` option (second argument of `cr
 
 That was a lot to unpack, so take your time and experiment with it, or play with the example provided.
 
+## Easing
+
+Easing helps animations feel smoother. Objects in real life don't snap into place. When they get closer to their position, they should gradually slow down before stopping.\
+
+By default, this package does linear smoothing. To specify an easing function, you pass it in the `options` object (second parameter) as `ease`:
+
+```ts
+const evaluate = createTimeline(
+  [
+    { time: 0, value: 0 },
+    { time: 1, value: 1 }
+  ],
+  { ease: easeInOut }
+);
+
+evaluate(0.1);
+// returns 0.09549150281252627 instead of 0.1
+```
+
+It must be a function with the following signature:
+
+```ts
+type EasingFn = (x: number) => number;
+```
+
+There are 4 easing functions exported by this package: `easeLinear`, `easeIn`, `easeOut`, `easeInOut`.\
+You must import them and pass them back to `createTimeline`.\
+They are not built into the package in order to avoid them being bundled with your project if you never use them.
+
+Check out [easings.net](https://easings.net/) to choose the best easing function for you.
+
 ## API
 
 ### Default export
@@ -195,15 +226,29 @@ type Options<T> = {
 };
 ```
 
+### ease*X*
+
+Four easing functions of type `EasingFn`:\
+`easeLinear`, `easeIn`, `easeOut`, `easeInOut`.
+
+### EasingFn
+
+If you ever need this for your custom easing functions.
+
+```ts
+type EasingFn = (x: number) => number;
+```
+
 ## Options
 
 The options object is the second argument to `createTimeline`.\
 If you are orchestrating numbers, no options are mandatory.\
 However, if you are orchestrating complex values, the `lerp` option is **required**.
 
-| option | default   | required                    | type        | description                                     |
-| ------ | --------- | --------------------------- | ----------- | ----------------------------------------------- |
-| lerp   | undefined | if your value is not number | Lerper\<T\> | function which lerps between your type of value |
+| option | default    | required                    | type        | description                                     |
+| ------ | ---------- | --------------------------- | ----------- | ----------------------------------------------- |
+| lerp   | undefined  | if your value is not number | Lerper\<T\> | function which lerps between your type of value |
+| ease   | easeLinear | no                          | EasingFn    | easing function                                 |
 
 ## License
 

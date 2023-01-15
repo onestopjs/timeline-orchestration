@@ -1,4 +1,5 @@
 import { createTimeline } from '../createTimeline';
+import { easeInOut } from '../easings';
 
 describe('basics', () => {
   it('should throw when no frames', () => {
@@ -131,5 +132,66 @@ describe('lerp between ANY values', () => {
     expect(fn(8)).toEqual({ x: 160, y: 320 });
     expect(fn(14)).toEqual({ x: 280, y: 560 });
     expect(fn(18)).toEqual({ x: 360, y: 720 });
+  });
+});
+
+describe('easing functions', () => {
+  it('should do linear easing by default', () => {
+    const fn = createTimeline([
+      { time: 0, value: 0 },
+      { time: 1, value: 10 }
+    ]);
+
+    expect(fn(0)).toEqual(0);
+    expect(fn(0.1)).toEqual(1);
+    expect(fn(0.9)).toEqual(9);
+    expect(fn(1)).toEqual(10);
+  });
+
+  it('should respect easing function', () => {
+    const fn = createTimeline(
+      [
+        { time: 0, value: 0 },
+        { time: 1, value: 10 }
+      ],
+      { ease: easeInOut }
+    );
+
+    // this specific function mostly affects numbers close to 0 and 1
+    // so those should be different than linear
+    expect(fn(0.1)).not.toEqual(1);
+    expect(fn(0.9)).not.toEqual(9);
+  });
+
+  it('should respect easing function for all elements', () => {
+    const fn = createTimeline(
+      [
+        { time: 0, value: 0 },
+        { time: 1, value: 10 },
+        { time: 2, value: 20 }
+      ],
+      { ease: easeInOut }
+    );
+
+    expect(fn(0.1)).not.toEqual(1);
+    expect(fn(0.9)).not.toEqual(9);
+    expect(fn(1.1)).not.toEqual(11);
+    expect(fn(1.9)).not.toEqual(19);
+  });
+
+  it('should follow the easing function at all times', () => {
+    const fn = createTimeline(
+      [
+        { time: 0, value: 0 },
+        { time: 1, value: 10 }
+      ],
+      { ease: easeInOut }
+    );
+
+    for (let i = 0; i <= 1; i += 0.1) {
+      // according to jest: 0 !== -0
+      // this ugliness avoids that
+      expect(fn(i) === easeInOut(i) * 10).toEqual(true);
+    }
   });
 });

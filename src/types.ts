@@ -14,6 +14,9 @@ export type Lerper<T> = (
 
 export type Options<T> = {
   lerp: Lerper<T>;
+  ease?: EasingFn;
 };
 
 export type EvaluateTimeline<T> = (time: number) => T;
+
+export type EasingFn = (x: number) => number;

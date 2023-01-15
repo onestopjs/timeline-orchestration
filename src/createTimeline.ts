@@ -1,3 +1,4 @@
+import { easeLinear } from './easings';
 import getFramesAndRatio from './getFramesAndRatio';
 import { EvaluateTimeline, Lerper, Options, TimelineFrame } from './types';
 import { isFrameValueNumber, lerp as lerpNumber } from './utils';
@@ -21,6 +22,8 @@ export function createTimeline<T>(
     throw new Error('You must provide frames.');
   }
 
+  const easingFn = options?.ease ?? easeLinear;
+
   if (isFrameValueNumber(frames)) {
     const lerp =
       options && options.lerp
@@ -31,7 +34,7 @@ export function createTimeline<T>(
     const evaluateNumberTimeline: EvaluateTimeline<number> = (time) => {
       const [frame1, frame2, ratio] = getFramesAndRatio(frames, time);
 
-      return lerp(frame1.value, frame2.value, ratio, lerpNumber);
+      return lerp(frame1.value, frame2.value, easingFn(ratio), lerpNumber);
     };
 
     return evaluateNumberTimeline;
@@ -54,7 +57,7 @@ export function createTimeline<T>(
   const evaluateTimeline: EvaluateTimeline<T> = (time) => {
     const [frame1, frame2, ratio] = getFramesAndRatio(frames, time);
 
-    return lerp(frame1.value, frame2.value, ratio, lerpNumber);
+    return lerp(frame1.value, frame2.value, easingFn(ratio), lerpNumber);
   };
 
   return evaluateTimeline;
