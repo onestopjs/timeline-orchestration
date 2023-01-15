@@ -25,6 +25,20 @@ describe('basics', () => {
     expect(fn(-5)).toEqual(0);
     expect(fn(5000)).toEqual(100);
   });
+
+  it('should not matter if frames are passed in the correct order', () => {
+    const fn = createTimeline([
+      { time: 20, value: 200 },
+      { time: 0, value: 0 },
+      { time: 10, value: 100 }
+    ]);
+
+    expect(fn(0)).toEqual(0);
+    expect(fn(5)).toEqual(50);
+    expect(fn(10)).toEqual(100);
+    expect(fn(15)).toEqual(150);
+    expect(fn(20)).toEqual(200);
+  });
 });
 
 describe('lerp between numbers', () => {

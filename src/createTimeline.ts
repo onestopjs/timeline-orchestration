@@ -22,9 +22,12 @@ export function createTimeline<T>(
     throw new Error('You must provide frames.');
   }
 
+  // do as much work as possible outside of EvaluateTimeline functions
+  // because they will be run a lot of times
+  const normalizedFrames = [...frames].sort((a, b) => a.time - b.time);
   const easingFn = options?.ease ?? easeLinear;
 
-  if (isFrameValueNumber(frames)) {
+  if (isFrameValueNumber(normalizedFrames)) {
     const lerp =
       options && options.lerp
         ? // https://i.kym-cdn.com/photos/images/original/001/820/208/0d5.jpg
@@ -32,7 +35,7 @@ export function createTimeline<T>(
         : lerpNumber;
 
     const evaluateNumberTimeline: EvaluateTimeline<number> = (time) => {
-      const [frame1, frame2, ratio] = getFramesAndRatio(frames, time);
+      const [frame1, frame2, ratio] = getFramesAndRatio(normalizedFrames, time);
 
       return lerp(frame1.value, frame2.value, easingFn(ratio), lerpNumber);
     };
@@ -55,7 +58,7 @@ export function createTimeline<T>(
 
   const { lerp } = options;
   const evaluateTimeline: EvaluateTimeline<T> = (time) => {
-    const [frame1, frame2, ratio] = getFramesAndRatio(frames, time);
+    const [frame1, frame2, ratio] = getFramesAndRatio(normalizedFrames, time);
 
     return lerp(frame1.value, frame2.value, easingFn(ratio), lerpNumber);
   };
